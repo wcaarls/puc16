@@ -1,4 +1,4 @@
-# PUC8
+# PUC16
 
 Assembler and C compiler for the PUC16 processor
 
@@ -25,7 +25,7 @@ infrastructure for it.
 
 # Instruction set architecture
 
-This very simple processor is a Harvard design, with 17-bit instructions and 8-bit data values. Both instruction and data memories have 256 addresses.
+This very simple processor is a Von Neumann design, with 16-bit instructions and 16-bit data words. It does not support byte addressing.
 
 ## Registers
 
@@ -36,9 +36,9 @@ There are 16 registers. `r14` is `sp`; `r15` is `pc`. The C compiler uses `r13` 
 All ALU instructions and MOV set flags.
 
 | Group(2) | Op(2) | Nibble 1(4) | Nibble 2(4) | Nibble 3(4) | Mnm | Effect | Example |
-|---|---|---|---|---|---|---|---|---|
+|---|---|---|---|---|---|---|---|
 | 00 | 00 | rd          | c8u(7..4)  | c8u(3..0)  | MOV  | rd <- c8u                    | `mov  r0, 254`        |
-| 00 | 01 | rd          | c8u(7..4)  | c8u(3..0)  | MOVT | rd <- rd | (c8u<<8)          | `movt r0, 254`        |
+| 00 | 01 | rd          | c8u(7..4)  | c8u(3..0)  | MOVT | rd <- rd \| (c8u<<8)          | `movt r0, 254`        |
 | 00 | 10 | cond        | c8i(7..4)  | c8i(3..0   | B    | if cond then pc <- pc + c8i  | `b    -4`             |
 | 00 | 11 | c12u(11..8) | c12u(7..4) | c12u(3..0) | JMP  | pc <- c12u                   | `jmp  254`            |
 | 01 | 00 | rd          | rs         | c4i        | LDR  | rd <- [rs + c4i]             | `ldr  r0, [r1, 4]`    |
@@ -143,14 +143,14 @@ Apart from these statements, the assembler recognizes the following directives:
 # Installation
 
 ```
-pip install puc8
+pip install puc16
 ```
 
 or
 
 ```
-git clone https://github.com/wcaarls/puc8
-cd puc8
+git clone https://github.com/wcaarls/puc16
+cd puc16
 pip install .
 ```
 
