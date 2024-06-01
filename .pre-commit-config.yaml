@@ -1,0 +1,41 @@
+exclude: '^ppci/.*$'
+repos:
+-   repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v3.2.0
+    hooks:
+    -   id: trailing-whitespace
+    -   id: end-of-file-fixer
+    -   id: check-added-large-files
+    -   id: check-ast
+    -   id: check-executables-have-shebangs
+    -   id: check-docstring-first
+    -   id: check-merge-conflict
+    -   id: double-quote-string-fixer
+        exclude: "puc16/ppci/.*"
+    -   id: mixed-line-ending
+-   repo: local
+    hooks:
+    -   id: as
+        name: Assemble examples
+        language: python
+        entry: tools/testas
+        always_run: true
+        pass_filenames: false
+    -   id: cc
+        name: Compile examples
+        language: python
+        entry: tools/testcc
+        always_run: true
+        pass_filenames: false
+    -   id: asmunit
+        name: Assembly unit tests
+        language: python
+        entry: python -m puc16.asm examples/asm/unittest.asm -t 254
+        always_run: true
+        pass_filenames: false
+    -   id: cunit
+        name: C unit tests
+        language: python
+        entry: python -m puc16.cc examples/c/unittest.c -O0 -t 1
+        always_run: true
+        pass_filenames: false
