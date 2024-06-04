@@ -45,8 +45,8 @@ class CContext:
         self.type_size_map = {
             BasicType.CHAR: (1, 1),
             BasicType.UCHAR: (1, 1),
-            BasicType.SHORT: (2, 2),
-            BasicType.USHORT: (2, 2),
+            BasicType.SHORT: (1, 1),
+            BasicType.USHORT: (1, 1),
             BasicType.INT: (int_size, int_alignment),
             BasicType.UINT: (int_size, int_alignment),
             BasicType.LONG: (long_size, long_alignment),
@@ -95,9 +95,9 @@ class CContext:
 
         bit_size = 8 * self.type_size_map[typ.type_id][0]
         if typ.is_signed:
-            max_value = (2 ** (bit_size - 1)) - 1
+            max_value = max(32767, (2 ** (bit_size - 1)) - 1)
         else:
-            max_value = (2 ** (bit_size)) - 1
+            max_value = max(65535, (2 ** (bit_size)) - 1)
         return max_value
 
     def sizeof(self, typ: types.CType):

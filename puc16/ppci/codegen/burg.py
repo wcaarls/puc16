@@ -284,9 +284,9 @@ class BurgGenerator:
 
         self.print(0, "#!/usr/bin/python")
         self.print(
-            0, "from puc8.ppci.codegen.treematcher import BaseMatcher, State"
+            0, "from puc16.ppci.codegen.treematcher import BaseMatcher, State"
         )
-        self.print(0, "from puc8.ppci.utils.tree import Tree")
+        self.print(0, "from puc16.ppci.utils.tree import Tree")
         for header in self.system.header_lines:
             self.print(0, header)
         self.print(0)

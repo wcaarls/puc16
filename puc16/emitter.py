@@ -47,7 +47,8 @@ use ieee.std_logic_1164.all;
 package {pkg} is
   type {pkg}_t is array(0 to 8191) of std_logic_vector(15 downto 0);
 
-  constant {pkg}_init: {pkg}_t := """, file=f, end='')
+  constant {pkg}_init: {pkg}_t := (
+""", file=f, end='')
     else:
         pkg = ''
         print(f"""  signal init: init_t := (
