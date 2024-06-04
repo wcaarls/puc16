@@ -7,7 +7,7 @@ from ..arch_info import ArchInfo, TypeInfo
 from ..generic_instructions import Label, Alignment, RegisterUseDef
 from ..runtime import get_runtime_files
 from . import instructions, registers
-from ..data_instructions import data_isa
+from ..data_instructions import data_isa, DByte
 
 class PUC16Arch(Architecture):
     """ PUC16 architecture """
@@ -103,6 +103,26 @@ class PUC16Arch(Architecture):
 
         # Return
         yield instructions.Pop(registers.pc)
+
+        # Add constants
+        yield from self.litpool(frame)
+
+    def litpool(self, frame):
+        """ Generate instruction for the current literals """
+
+        # Add constant literals:
+        while frame.constants:
+            label, value = frame.constants.pop(0)
+            yield Label(label)
+            if isinstance(value, int):
+                yield DByte(value)
+            elif isinstance(value, str):
+                yield DByte(value)
+            elif isinstance(value, bytes):
+                for byte in value:
+                    yield DByte(byte)
+            else:  # pragma: no cover
+                raise NotImplementedError("Constant of type {}".format(value))
 
     def get_callee_saved(self, frame):
         saved_registers = []
