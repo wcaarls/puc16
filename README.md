@@ -19,9 +19,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 # Introduction
 
-PUC16 is a microcontroller with 16-bit registers. It is used in the
-ENG1448 course of PUC-Rio. This is the assembler and C compiler
-infrastructure for it.
+PUC16 is a microcontroller with 16 opcodes and 16 16-bit registers.
+It is used in the ENG1448 course of PUC-Rio. This is the assembler and
+C compiler infrastructure for it.
 
 # Instruction set architecture
 
@@ -33,14 +33,14 @@ There are 16 registers. `r14` is `sp`; `r15` is `pc`. The C compiler uses `r13` 
 
 ## Instructions
 
-All ALU instructions and MOV set flags.
+All ALU instructions set flags.
 
 | Group(2) | Op(2) | Nibble 1(4) | Nibble 2(4) | Nibble 3(4) | Mnm | Effect | Example |
 |---|---|---|---|---|---|---|---|
 | 00 | 00 | rd          | c8u(7..4)  | c8u(3..0)  | MOV  | rd <- c8u                    | `mov  r0, 254`        |
-| 00 | 01 | rd          | c8u(7..4)  | c8u(3..0)  | MOVT | rd <- rd \| (c8u<<8)          | `movt r0, 254`        |
-| 00 | 10 | cond        | c8i(7..4)  | c8i(3..0   | B    | if cond then pc <- pc + c8i  | `b    -4`             |
-| 00 | 11 | c12u(11..8) | c12u(7..4) | c12u(3..0) | JMP  | pc <- c12u                   | `jmp  254`            |
+| 00 | 01 | rd          | c8u(7..4)  | c8u(3..0)  | MOVT | rd <- (rd&255) \| (c8u<<8)   | `movt r0, 254`        |
+| 00 | 10 | cond        | c8i(7..4)  | c8i(3..0   | B... | if cond then pc <- pc + c8i  | `b    -4`             |
+| 00 | 11 | c12u(11..8) | c12u(7..4) | c12u(3..0) | JMP  | pc <- c12u                   | `jmp  2543`           |
 | 01 | 00 | rd          | rs         | c4i        | LDR  | rd <- [rs + c4i]             | `ldr  r0, [r1, 4]`    |
 | 01 | 01 | rs1         | rs2        | c4i        | STR  | [rs2 + c4i] <- rs1           | `str  r0, [r1, 4]`    |
 | 01 | 10 | 0000        | 1110       | rs         | PUSH | [sp] <- rs, sp <- sp - 1     | `push r0`             |
@@ -52,8 +52,8 @@ All ALU instructions and MOV set flags.
 | 11 | 00 | rd          | rs1        | 0 c3u      | SHFT | rd << (c3u+1)                | `shft r0, r1, 8`[^1]  |
 | 11 | 00 | rd          | rs1        | 1 c3u      | SHFT | rd >> (c3u+1)                | `shft r0, r1, -3`[^2] |
 | 11 | 01 | rd          | rs1        | rs2        | AND  | rd <- rs1 & rs2              | `and  r0, r1, r2`     |
-| 11 | 10 | rd          | rs1        | rs2        | OR   | rd <- rs1 \| rs2             | `orr  r0, r1, r2`     |
-| 11 | 11 | rd          | rs1        | rs2        | XOR  | rd <- rs1 ^ rs2              | `eor  r0, r1, r2`     |
+| 11 | 10 | rd          | rs1        | rs2        | OR   | rd <- rs1 \| rs2             | `or   r0, r1, r2`     |
+| 11 | 11 | rd          | rs1        | rs2        | XOR  | rd <- rs1 ^ rs2              | `xor  r0, r1, r2`     |
 
 [^1]: May be implemented as a constant shift left of 1.
 [^2]: May be implemented as a constant shift right of 1.
@@ -98,7 +98,7 @@ When the operand is used as the contents of a memory address, it must be enclose
 ```asm
 ldr r0, [r12]
 .section data
-inp: .db 0
+inp: .dw 0
 ```
 Apart from these statements, the assembler recognizes the following directives:
 
@@ -127,7 +127,7 @@ Apart from these statements, the assembler recognizes the following directives:
   Creates a `LABEL` for a specific constant `VALUE`. Values may be character constants, e.g. `"c"`
 
 - ```asm
-  .db VALUE
+  .dw VALUE
   ```
 
   Inserts a `VALUE` into the instruction stream. The value may be a string constant, e.g. `"Hello, world"`

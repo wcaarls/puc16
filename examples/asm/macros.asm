@@ -54,3 +54,22 @@ _wait: mov  r12, @lcr
        mov  r12, @ldr
        str  $0, [r12]  ; Clear LCD
        .endmacro
+
+; Write LCD string.
+; INPUT : LCD string constant in $0
+; OUTPUT: None
+; NOTE  : Clobbers r10, r11, r12
+       .macro writestr
+       .section data
+_data: .dw $0, 0
+       .section code
+       mov r11, low(@_data)
+       movt r11, high(@_data)
+_loop: ldr r10, [r11]
+       add r10, r10, 0
+       bz @_done
+       writelcd r10
+       add r11, r11, 1
+       b @_loop
+_done:
+       .endmacro

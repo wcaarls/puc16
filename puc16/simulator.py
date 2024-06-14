@@ -87,7 +87,7 @@ class Simulator:
         next.regs[15] += 1
 
         addr = (next.regs[r2] + c4i)&MAXVAL
-        if (m == 'shift' or m == 'add' or m == 'sub') and opcode[3] == '1':
+        if m == 'shft' or ((m == 'add' or m == 'sub') and opcode[3] == '1'):
             val = c4
         else:
             val = state.regs[r3]
@@ -114,16 +114,12 @@ class Simulator:
                 next.regs[r1] = c8
             else:
                 next.regs[r1] = next.regs[r2]
-            next.zero = next.regs[r1] == 0
-            next.carry = False
-            next.negative = bool(next.regs[r1] & NEGBIT)
-            next.overflow = False
+                next.zero = next.regs[r1] == 0
+                next.carry = False
+                next.negative = bool(next.regs[r1] & NEGBIT)
+                next.overflow = False
         elif m == 'movt':
             next.regs[r1] = (next.regs[r1] & 255) + 256*c8
-            next.zero = next.regs[r1] == 0
-            next.carry = False
-            next.negative = bool(next.regs[r1] & NEGBIT)
-            next.overflow = False
         elif m[0] == 'b':
             # Branches
             if ( m == 'b' or

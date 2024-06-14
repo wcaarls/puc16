@@ -34,13 +34,14 @@ class Disassembler():
                                     val -= 16
                                 # Convert [addr], offset into [addr, offset]
                                 dis = dis[:-3] + f', {val}], '
-                            elif mnemonic == 'shft':
-                                dir = ''
-                                if val > 7:
-                                    dir = '-'
-                                dis += f'{dir}{(val&7) + 1}, '
                             else:
                                 dis += f'{val}, '
+                        elif o == 'S':
+                            val = int(inst[istart:istart+4], 2)
+                            dir = ''
+                            if val > 7:
+                                dir = '-'
+                            dis += f'{dir}{(val&7) + 1}, '
                         elif o == '8':
                             val = int(inst[istart:istart+8], 2)
                             dis += f'{val}, '

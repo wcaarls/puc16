@@ -51,7 +51,7 @@ class Preprocessor:
         if c >= 0:
             line = line[:c]
         line = line.strip()
-        return line.lower()
+        return ' '.join([t.lower() if t[0] != '"' else t for t in _split(line)])
 
     def _splitlabel(self, line):
         """Split a line into a label and an instruction."""
@@ -60,6 +60,30 @@ class Preprocessor:
             return (line[:c].strip(), line[c+1:].strip())
         else:
             return ('',line)
+
+    def _splitdw(self, file, idx, label, inst):
+        """Split .dw into single-word constants."""
+        code = []
+        if inst != '':
+            mnemonic, operands = split(inst)
+            if mnemonic == '.dw':
+                tmp = label
+                for o in operands:
+                    if o[0] == r'"':
+                        if len(o) < 3 or o[-1] != r'"':
+                            raise SyntaxError(f'{file}:{idx:3}: Malformed string constant')
+                        for c in o[1:-1]:
+                            code.append((file, idx, tmp, r'.dw "' + c + r'"'))
+                            tmp = ''
+                    else:
+                        code.append((file, idx, tmp, '.dw ' + o))
+                        tmp = ''
+            else:
+                code.append((file, idx, label, inst))
+        else:
+            code.append((file, idx, label, inst))
+             
+        return code
 
     def _preprocess(self, file, macros={}):
         """Resolves .include and .macro directives, and splits .dw directives into single words."""
@@ -107,17 +131,7 @@ class Preprocessor:
                     macros.update(macros2)
                 elif mnemonic == '.dw':
                     # Split .dw into single-word constants
-                    tmp = label
-                    for o in operands:
-                        if o[0] == r'"':
-                            if len(o) < 3 or o[-1] != r'"':
-                                raise SyntaxError(f'{file}:{idx:3}: Malformed string constant')
-                            for c in o[1:-1]:
-                                code.append((file, idx, tmp, r'.dw "' + c + r'"'))
-                                tmp = ''
-                        else:
-                            code.append((file, idx, tmp, '.dw ' + o))
-                            tmp = ''
+                    code.extend(self._splitdw(file, idx, label, inst))
                 elif mnemonic == '.macro':
                     # Create a new macro.
                     if len(operands) != 1:
@@ -155,7 +169,7 @@ class Preprocessor:
                                     raise SyntaxError(f'Invalid argument ${arg} in call to macro {mnemonic}')
                             elif inst2[ii] == '@' and ii < len(inst2)-1 and inst2[ii+1] == '_':
                                 # Make label use local
-                                while ii < len(inst2) and not inst2[ii].isspace() and inst2[ii] != ']':
+                                while ii < len(inst2) and not inst2[ii].isspace() and inst2[ii] != ']' and inst2[ii] != ')':
                                     newinst = newinst + inst2[ii]
                                     ii += 1
                                 newinst = newinst + str(nonce) + '_'
@@ -163,7 +177,7 @@ class Preprocessor:
                                 newinst = newinst + inst2[ii]
                                 ii += 1
 
-                        code.append((file2, idx2, label2, newinst))
+                        code.extend(self._splitdw(file2, idx2, label2, newinst))
                     nonce += 1
                 else:
                     code.append((file, idx, label, inst))
