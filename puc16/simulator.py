@@ -2,6 +2,7 @@
    (c) 2020-2024 Wouter Caarls, PUC-Rio
 """
 
+import array
 import copy
 from .disassembler import Disassembler
 
@@ -10,14 +11,14 @@ NEGBIT = 32768
 CARRYBIT = 65536
 CODESTART = 16
 STACKSTART = 8191
-MEMSIZE = 8192
+MEMSIZE = 8192+4800
 
 class State:
     """Machine state for simulator."""
     def __init__(self, mem=None,origin=None):
         self.regs = [0 for i in range(16)]
 
-        self.mem = [0 for i in range(MEMSIZE)]
+        self.mem = array.array('H', [0 for i in range(MEMSIZE)])
         if mem:
             for s in mem:
                 o = origin[s]
@@ -38,9 +39,11 @@ class State:
         for i in range(14):
             if self.regs[i] != state.regs[i]:
                 d += f', r{i} <- {state.regs[i]}'
+        
         for i in range(MEMSIZE):
             if self.mem[i] != state.mem[i]:
                 d += f', [{i}] <- {state.mem[i]}'
+        
         if self.regs[14] != state.regs[14]:
             d += f', sp <- {state.regs[14]}'
         if self.zero != state.zero:
@@ -101,14 +104,14 @@ class Simulator:
                 else:
                     next.regs[r1] = 0
             else:
-                next.regs[r1] = next.mem[addr&STACKSTART]
+                next.regs[r1] = next.mem[addr%MEMSIZE]
         elif m == 'str':
             if addr == 7:
                 print(chr(next.regs[r1]), end='')
             elif addr == 8 and next.regs[r1] == 1:
                 print()
             else:
-                next.mem[addr&STACKSTART] = next.regs[r1]
+                next.mem[addr%MEMSIZE] = next.regs[r1]
         elif m == 'mov':
             if opcode == '0000':
                 next.regs[r1] = c8
@@ -134,12 +137,12 @@ class Simulator:
         elif m == 'push':
             if next.regs[14] == -1:
                 raise RuntimeError('Stack overflow')
-            next.mem[next.regs[14]&STACKSTART] = next.regs[r3]
+            next.mem[next.regs[14]%MEMSIZE] = next.regs[r3]
             next.regs[14] -= 1
         elif m == 'pop' or m == 'ret':
             if next.regs[14] == STACKSTART:
                 raise RuntimeError('Stack underflow')
-            next.regs[r1] = state.mem[(next.regs[14]+1)&STACKSTART]
+            next.regs[r1] = state.mem[(next.regs[14]+1)%MEMSIZE]
             next.regs[14] += 1
         else:
             # ALU instructions (modify flags)
@@ -284,7 +287,7 @@ class Simulator:
         state = State(mem, origin)
 
         for s in range(steps):
-            bin = mem['code'][state.regs[15]][0]
+            bin = format(state.mem[state.regs[15]], '016b')
             state = copy.deepcopy(self.execute(bin, state))
 
         return state.regs[15]
