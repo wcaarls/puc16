@@ -36,8 +36,8 @@ class CContext:
         # C requires sizeof(int) <= sizeof(long):
         long_size = max(int_size, long_size)
         long_alignment = max(int_alignment, long_alignment)
-        longlong_size = max(int_size, 8)
-        longlong_alignment = max(int_alignment, 8)
+        longlong_size = max(int_size, 4)
+        longlong_alignment = max(int_alignment, 4)
 
         ptr_size = self.arch_info.get_size("ptr")
         double_size = self.arch_info.get_size(ir.f64)
@@ -53,12 +53,12 @@ class CContext:
             BasicType.ULONG: (long_size, long_alignment),
             BasicType.LONGLONG: (longlong_size, longlong_alignment),
             BasicType.ULONGLONG: (longlong_size, longlong_alignment),
-            BasicType.FLOAT: (4, 4),
+            BasicType.FLOAT: (2, 2),
             BasicType.DOUBLE: (double_size, double_alignment),
             BasicType.LONGDOUBLE: (10, 10),
         }
 
-        int_map = {1: "b", 2: "h", 4: "i", 8: "q"}
+        int_map = {1: "h", 2: "i", 4: "q"}
 
         if self.arch_info.endianness == Endianness.LITTLE:
             byte_order = "<"
@@ -93,11 +93,11 @@ class CContext:
         if not typ.is_integer:
             raise ValueError("Can only get max value of integer types")
 
-        bit_size = 8 * self.type_size_map[typ.type_id][0]
+        bit_size = 16 * self.type_size_map[typ.type_id][0]
         if typ.is_signed:
-            max_value = max(32767, (2 ** (bit_size - 1)) - 1)
+            max_value = (2 ** (bit_size - 1)) - 1
         else:
-            max_value = max(65535, (2 ** (bit_size)) - 1)
+            max_value = (2 ** (bit_size)) - 1
         return max_value
 
     def sizeof(self, typ: types.CType):

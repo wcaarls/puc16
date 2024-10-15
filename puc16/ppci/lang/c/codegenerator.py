@@ -34,25 +34,25 @@ class CCodeGenerator:
         self.labeled_blocks = {}
         self.switch_options = None
         self.static_counter = 0  # Unique number to make static vars unique
-        int_types = {1: ir.i8, 2: ir.i16, 4: ir.i32, 8: ir.i64}
-        uint_types = {1: ir.u8, 2: ir.u16, 4: ir.u32, 8: ir.u64}
+        int_types = {1: ir.i16, 2: ir.i32, 4: ir.i64}
+        uint_types = {1: ir.u16, 2: ir.u32, 4: ir.u64}
         int_size = self.context.arch_info.get_size("int")
         long_size = self.context.arch_info.get_size("long")
         self.ptr_size = self.context.arch_info.get_size("ptr")
         self.ir_type_map = {
             BasicType.CHAR: (ir.i8, 1),
             BasicType.UCHAR: (ir.u8, 1),
-            BasicType.SHORT: (ir.i16, 2),
-            BasicType.USHORT: (ir.u16, 2),
+            BasicType.SHORT: (ir.i16, 1),
+            BasicType.USHORT: (ir.u16, 1),
             BasicType.INT: (int_types[int_size], int_size),
             BasicType.UINT: (uint_types[int_size], int_size),
             BasicType.LONG: (int_types[long_size], long_size),
             BasicType.ULONG: (uint_types[long_size], long_size),
-            BasicType.LONGLONG: (ir.i64, 8),
-            BasicType.ULONGLONG: (ir.u64, 8),
-            BasicType.FLOAT: (ir.f32, 4),
-            BasicType.DOUBLE: (ir.f64, 8),
-            BasicType.LONGDOUBLE: (ir.f64, 8),  # TODO: is this correct?
+            BasicType.LONGLONG: (ir.i64, 4),
+            BasicType.ULONGLONG: (ir.u64, 4),
+            BasicType.FLOAT: (ir.f32, 2),
+            BasicType.DOUBLE: (ir.f64, 4),
+            BasicType.LONGDOUBLE: (ir.f64, 4),  # TODO: is this correct?
         }
         self._constant_evaluator = LinkTimeExpressionEvaluator(self)
 

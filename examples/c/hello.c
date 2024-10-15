@@ -4,9 +4,9 @@ unsigned char buf[] = "Hello, world!";
 
 void main(void)
 {
-  for (int ii=0; buf[ii]; ++ii)
+  for (char *cc=buf; *cc; ++cc)
   {
     while (inp(LDR));
-    outp(buf[ii], LDR);
+    outp(*cc, LDR);
   }
 }

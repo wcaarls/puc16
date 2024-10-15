@@ -51,7 +51,7 @@ package {pkg} is
 """, file=f, end='')
     else:
         pkg = ''
-        print(f"""  signal init: init_t := (
+        print(f"""  signal ram: ram_t := (
 """, file=f, end='')
     emitarray(mem['io'], f, origin['io'])
     emitarray(mem['code'], f, origin['code'])
