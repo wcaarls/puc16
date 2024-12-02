@@ -1,6 +1,6 @@
 ; Unit tests for 16-bit ENG1448 processor
-; When successful, halts at instruction 254, showing 0b01010101
-; When unsuccessful, halts at instruction 255, showing test number (1-38)
+; When successful, halts at instruction 4094, showing 0b01010101
+; When unsuccessful, halts at instruction 4095, showing test number (1-31)
 
        .macro setled
        mov  r12, 0x05

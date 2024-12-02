@@ -37,23 +37,23 @@ All ALU instructions set flags.
 
 | Group(2) | Op(2) | Nibble 1(4) | Nibble 2(4) | Nibble 3(4) | Mnm | Effect | Example |
 |---|---|---|---|---|---|---|---|
-| 00 | 00 | rd          | c8u(7..4)  | c8u(3..0)  | MOV  | rd <- c8u                    | `mov  r0, 254`        |
-| 00 | 01 | rd          | c8u(7..4)  | c8u(3..0)  | MOVT | rd <- (rd&255) \| (c8u<<8)   | `movt r0, 254`        |
-| 00 | 10 | cond        | c8i(7..4)  | c8i(3..0   | B... | if cond then pc <- pc + c8i  | `b    -4`             |
-| 00 | 11 | c12u(11..8) | c12u(7..4) | c12u(3..0) | JMP  | pc <- c12u                   | `jmp  2543`           |
-| 01 | 00 | rd          | rs         | c4i        | LDR  | rd <- [rs + c4i]             | `ldr  r0, [r1, 4]`    |
-| 01 | 01 | rs1         | rs2        | c4i        | STR  | [rs2 + c4i] <- rs1           | `str  r0, [r1, 4]`    |
-| 01 | 10 | 0000        | 1110       | rs         | PUSH | [sp] <- rs, sp <- sp - 1     | `push r0`             |
-| 01 | 11 | rd          | 1110       | 0000       | POP  | rd <- [sp + 1], sp <- sp + 1 | `pop  r0`             |
-| 10 | 00 | rd          | rs1        | rs2        | ADD  | rd <- rs1 + rs2              | `add  r0, r1, r2`     |
-| 10 | 01 | rd          | rs1        | c4u        | ADD  | rd <- rs1 + c4u              | `add  r0, r1, 5`      |
-| 10 | 10 | rd          | rs1        | rs2        | SUB  | rd <- rs1 - rs2              | `sub  r0, r1, r2`     |
-| 10 | 11 | rd          | rs1        | c4u        | SUB  | rd <- rs1 - c4u              | `sub  r0, r1, 13`     |
-| 11 | 00 | rd          | rs1        | 0 c3u      | SHFT | rd << (c3u+1)                | `shft r0, r1, 8`[^1]  |
-| 11 | 00 | rd          | rs1        | 1 c3u      | SHFT | rd >> (c3u+1)                | `shft r0, r1, -3`[^2] |
-| 11 | 01 | rd          | rs1        | rs2        | AND  | rd <- rs1 & rs2              | `and  r0, r1, r2`     |
-| 11 | 10 | rd          | rs1        | rs2        | OR   | rd <- rs1 \| rs2             | `or   r0, r1, r2`     |
-| 11 | 11 | rd          | rs1        | rs2        | XOR  | rd <- rs1 ^ rs2              | `xor  r0, r1, r2`     |
+| 00 | 00 | rd          | c8u(7..4)  | c8u(3..0)  | MOV  | rd <- c8u                       | `mov  r0, 254`        |
+| 00 | 01 | rd          | c8u(7..4)  | c8u(3..0)  | MOVT | rd <- (rd&255) \| (c8u<<8)      | `movt r0, 254`        |
+| 00 | 10 | cond        | c8i(7..4)  | c8i(3..0   | B... | if cond then pc <- pc + c8i + 1 | `b    -4`             |
+| 00 | 11 | c12u(11..8) | c12u(7..4) | c12u(3..0) | JMP  | pc <- c12u                      | `jmp  2543`           |
+| 01 | 00 | rd          | rs         | c4i        | LDR  | rd <- [rs + c4i]                | `ldr  r0, [r1, 4]`    |
+| 01 | 01 | rs1         | rs2        | c4i        | STR  | [rs2 + c4i] <- rs1              | `str  r0, [r1, 4]`    |
+| 01 | 10 | 0000        | 1110       | rs         | PUSH | [sp] <- rs, sp <- sp - 1        | `push r0`             |
+| 01 | 11 | rd          | 1110       | 0000       | POP  | rd <- [sp + 1], sp <- sp + 1    | `pop  r0`             |
+| 10 | 00 | rd          | rs1        | rs2        | ADD  | rd <- rs1 + rs2                 | `add  r0, r1, r2`     |
+| 10 | 01 | rd          | rs1        | c4u        | ADD  | rd <- rs1 + c4u                 | `add  r0, r1, 5`      |
+| 10 | 10 | rd          | rs1        | rs2        | SUB  | rd <- rs1 - rs2                 | `sub  r0, r1, r2`     |
+| 10 | 11 | rd          | rs1        | c4u        | SUB  | rd <- rs1 - c4u                 | `sub  r0, r1, 13`     |
+| 11 | 00 | rd          | rs1        | 0 c3u      | SHFT | rd << (c3u+1)                   | `shft r0, r1, 8`[^1]  |
+| 11 | 00 | rd          | rs1        | 1 c3u      | SHFT | rd >> (c3u+1)                   | `shft r0, r1, -3`[^2] |
+| 11 | 01 | rd          | rs1        | rs2        | AND  | rd <- rs1 & rs2                 | `and  r0, r1, r2`     |
+| 11 | 10 | rd          | rs1        | rs2        | OR   | rd <- rs1 \| rs2                | `or   r0, r1, r2`     |
+| 11 | 11 | rd          | rs1        | rs2        | XOR  | rd <- rs1 ^ rs2                 | `xor  r0, r1, r2`     |
 
 [^1]: May be implemented as a constant shift left of 1.
 [^2]: May be implemented as a constant shift right of 1.
@@ -74,15 +74,15 @@ All ALU instructions set flags.
 
 ## Condition codes
 
-| Condition | Meaning |
-|---|---|
-| 0000 | Unconditional |
-| 0001 | Zero flag set |
-| 0010 | Zero flag not set |
-| 0011 | Carry flag set |
-| 0100 | Carry flag not set |
-| 0101 | Signed less than |
-| 0110 | Signed greater than or equal |
+| Condition | Mnemonic | Meaning |
+|---|---|---|
+| 0000 |    | Unconditional                |
+| 0001 | z  | Zero flag set                |
+| 0010 | nz | Zero flag not set            |
+| 0011 | cs | Carry flag set               |
+| 0100 | cc | Carry flag not set           |
+| 0101 | lt | Signed less than             |
+| 0110 | ge | Signed greater than or equal |
 
 # Assembly language
 
