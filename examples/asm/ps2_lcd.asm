@@ -13,7 +13,7 @@ loop:  waitkb r0      ; Read character from keyboard
        bz   @clear    ; If enter, clear LCD
        writelcd r0    ; Otherwise, write to LCD
        b    @loop
-clear:mov   r0, 0     
+clear:mov   r0, 0
        clearlcd r0    ; Clear LCD
        b    @loop
 

@@ -179,7 +179,7 @@ class PUC16Arch(Architecture):
 
     def move(self, dst, src):
         return instructions.AddC(dst, src, 0, ismove=True)
-        
+
     def call(self, label):
         yield instructions.AddC(registers.r12, registers.pc, 2)
         yield instructions.Push(registers.r12)

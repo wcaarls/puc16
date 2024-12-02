@@ -82,7 +82,7 @@ class Preprocessor:
                 code.append((file, idx, label, inst))
         else:
             code.append((file, idx, label, inst))
-             
+
         return code
 
     def _preprocess(self, file, macros={}):
@@ -287,7 +287,7 @@ class Assembler:
                             elif r == '6':
                                 ret.append(f'{ord(o[1]):016b}')
                             else:
-                                raise ValueError(f"{lidx}: Unexpected character constant {o}")
+                                raise ValueError(f'{lidx}: Unexpected character constant {o}')
                         else:
                             # Getting specific bytes
                             LSB, MSB = False, False
@@ -300,7 +300,7 @@ class Assembler:
                                    MSB = True
                                 else:
                                    raise SyntaxError(f"{lidx}: {mnemonic} operand '{o}' does not apply a value function")
-                                   
+
                             if len(o) > 1 and o[0] == '@':
                                 # Label
                                 if o[1:] in labels:
@@ -313,12 +313,12 @@ class Assembler:
                                     val = int(o, 0)
                                 except:
                                     raise SyntaxError(f"{lidx}: {mnemonic} operand '{o}' is not a valid constant")
-                                    
+
                             if LSB:
                                 val = val&255
                             elif MSB:
                                 val = (val>>8)&255
-                                    
+
                             if r == '4':
                                 if val < -8 or val > 15:
                                     raise ValueError(f"{lidx}: {mnemonic} operand '{o}' ({val}) is not a valid 4-bit signed or unsigned constant")
@@ -352,7 +352,7 @@ class Assembler:
                             elif r == 'B':
                                 val = val-loc-1
                                 if val < -128 or val > 127:
-                                    raise ValueError(f"{lidx}: conditional branch target {o} (pc+1+{val}) out of bounds")
+                                    raise ValueError(f'{lidx}: conditional branch target {o} (pc+1+{val}) out of bounds')
                                 if val < 0:
                                     val = 256+val
                                 ret.append(f'{val:08b}')

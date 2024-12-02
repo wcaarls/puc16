@@ -334,7 +334,7 @@ bcc2:  shft r0, r1, 1
        b    @done
 bcc3:  jmp  @err
 
-done:  jmp  @succ       
+done:  jmp  @succ
 
        .org 0xFEB
 

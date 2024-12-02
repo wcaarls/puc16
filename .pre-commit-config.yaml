@@ -36,6 +36,6 @@ repos:
     -   id: cunit
         name: C unit tests
         language: python
-        entry: python -m puc16.cc examples/c/unittest.c -O0 -t 1
+        entry: python -m puc16.cc examples/c/unittest.c -O0 -t 19
         always_run: true
         pass_filenames: false

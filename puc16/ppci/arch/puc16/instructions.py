@@ -109,7 +109,7 @@ def make_rc(mnemonic, opcode, write=True, label=False, func=""):
         "r1": r1,
     }
     if not label:
-        patterns["c8"] = c8;    
+        patterns["c8"] = c8;
     members = {
         "tokens": [PUC16Token],
         "r1": r1,
@@ -634,7 +634,7 @@ def pattern_cjmpi(context, tree, c0, c1):
     jmp_ins = Jump(no_label.name, jumps=[no_label])
     context.emit(Bop(yes_label.name, jumps=[yes_label, jmp_ins]))
     context.emit(jmp_ins)
-    
+
 @isa.pattern("stm", "CJMPU16(reg, reg)", size=3, cycles=2, energy=2)
 @isa.pattern("stm", "CJMPU8(reg, reg)", size=3, cycles=2, energy=2)
 def pattern_cjmpu(context, tree, c0, c1):

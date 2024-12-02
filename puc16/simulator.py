@@ -39,11 +39,11 @@ class State:
         for i in range(14):
             if self.regs[i] != state.regs[i]:
                 d += f', r{i} <- {state.regs[i]}'
-        
+
         for i in range(MEMSIZE):
             if self.mem[i] != state.mem[i]:
                 d += f', [{i}] <- {state.mem[i]}'
-        
+
         if self.regs[14] != state.regs[14]:
             d += f', sp <- {state.regs[14]}'
         if self.zero != state.zero:
