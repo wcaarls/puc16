@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 """C compiler for ENG1448 16-bit processor
-   (c) 2020-2024 Wouter Caarls, PUC-Rio
+   (c) 2020-2025 Wouter Caarls, PUC-Rio
 """
 
 import sys, io, argparse
@@ -12,13 +12,15 @@ from .simulator import Simulator
 from .emitter import emitasm, emitvhdl
 
 def main():
-    parser = argparse.ArgumentParser(description='PUC16 C compiler (c) 2020-2024 Wouter Caarls, PUC-Rio')
+    parser = argparse.ArgumentParser(description='PUC16 C compiler (c) 2020-2025 Wouter Caarls, PUC-Rio')
     parser.add_argument('file', type=str,
                         help='C source file')
     parser.add_argument('-o', '--output', type=str,
                         help='Output file', default='-')
     parser.add_argument('-s', '--simulate', action='store_true',
                         help='Simulate resulting program')
+    parser.add_argument('-v', '--vga', action='store_true',
+                        help='Visualize VGA output during simulation')
     parser.add_argument('-t', '--test', metavar='N', type=int,
                         help='Simulate for 1000 steps and check whether PC == N')
     parser.add_argument('-S', action='store_true',
@@ -41,7 +43,7 @@ def main():
     if args.simulate or args.test:
         sim = Simulator()
         if args.simulate:
-            sim.process(mem, origin)
+            sim.process(mem, origin, args.vga)
         else:
             pc = sim.run(mem, origin, 1000)
             if pc != args.test:

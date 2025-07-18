@@ -7,7 +7,7 @@ except:
     long_description = ''
 
 setup(name='puc16',
-      version='0.1.0',
+      version='0.2.0',
       description='Assembler and C compiler for the PUC16 processor',
       long_description=long_description,
       long_description_content_type='text/markdown',
@@ -29,4 +29,7 @@ setup(name='puc16',
       entry_points = {
         'console_scripts': ['as-puc16=puc16.asm:main',
                             'cc-puc16=puc16.cc:main']
+      },
+      extras_require={
+        'vga': ['pygame', 'numpy']
       })

@@ -275,6 +275,7 @@ class Assembler:
                             o = o[1:-1]
 
                         # Register
+                        # TODO: register aliases (.def)
                         if len(o) < 2 or o[0] != 'r' or int(o[1:]) < 0 or int(o[1:]) > 15:
                             raise SyntaxError(f"{lidx}: {mnemonic} operand '{o}' is not a valid register")
                         ret.append(f'{int(o[1:]):04b}')

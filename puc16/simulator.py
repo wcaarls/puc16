@@ -1,17 +1,81 @@
 """Simulator for ENG1448 16-bit processor
-   (c) 2020-2024 Wouter Caarls, PUC-Rio
+   (c) 2020-2025 Wouter Caarls, PUC-Rio
 """
 
 import array
 import copy
+import time
 from .disassembler import Disassembler
+from .font import font8x8_basic
 
 MAXVAL = 65535
 NEGBIT = 32768
 CARRYBIT = 65536
 CODESTART = 16
 STACKSTART = 8191
-MEMSIZE = 8192+4800
+
+VRAM = 8*1024
+CRAM = 13*1024
+PRAM = 15*1024
+
+MEMSIZE = 16384
+
+VGA_CTRL_REG = 15
+
+class Screen:
+    def __init__(self):
+        global pygame
+        global np
+
+        import pygame
+        import numpy as np
+
+        pygame.init()
+        self.display = pygame.display.set_mode((640, 480))
+        self.image = np.zeros((640, 480, 3),dtype=np.uint8)
+
+        self.y, self.x = np.meshgrid(range(480), range(640))
+        self.ix = self.x//8
+        self.sx = self.x - self.ix*8
+        self.iy = self.y//8
+        self.sy = self.y - self.iy*8
+        self.iy2 = self.y//16
+        self.sy2 = (self.y - self.iy2*16) // 2
+
+    def draw(self, state):
+        for event in pygame.event.get():
+             if event.type == pygame.QUIT:
+                 pygame.quit()
+                 exit()
+
+        mem = np.asarray(state.mem)
+
+        # Line doubling mode
+        div = False
+        if state.mem[VGA_CTRL_REG]&1 == 1:
+            div = True
+
+        if div:
+            tile = mem[VRAM+self.iy2*80+self.ix]
+        else:
+            tile = mem[VRAM+self.iy*80+self.ix]
+        index = tile&255
+        palette = (tile>>8)&255
+        if div:
+            line = mem[CRAM+index*8+self.sy2]
+        else:
+            line = mem[CRAM+index*8+self.sy]
+        subpalette = (line>>(2*self.sx))&3
+        color = mem[PRAM + palette*4+subpalette]
+        self.image[:,:,0] = (color&31)<<3
+        self.image[:,:,1] = ((color>>5)&63)<<2
+        self.image[:,:,2] = ((color>>11)&31)<<3
+
+        pygame.surfarray.blit_array(self.display, self.image)
+        pygame.display.flip()
+
+    def close(self):
+        pygame.quit()
 
 class State:
     """Machine state for simulator."""
@@ -19,6 +83,20 @@ class State:
         self.regs = [0 for i in range(16)]
 
         self.mem = array.array('H', [0 for i in range(MEMSIZE)])
+
+        # Load font
+        for char in range(128):
+            for line in range(8):
+                l = font8x8_basic[char][line]
+                l16 = 0
+                for pix in range(8):
+                    p = (l>>pix)&1
+                    l16 = l16 | (p<<(2*pix))
+                self.mem[CRAM+char*8+line] = l16
+
+        # Set palette index 0 subindex 1 to white
+        self.mem[PRAM+1] = 65535
+
         if mem:
             for s in mem:
                 o = origin[s]
@@ -191,18 +269,27 @@ class Simulator:
    [a] = y Set memory address a to value y.
 """)
 
-    def process(self, mem, origin):
+    def process(self, mem, origin, vis=False):
         """Simulate machine code."""
+        screen = None
+        if vis:
+            screen = Screen()
+
         state = State(mem, origin)
 
         breakpoints = []
         quiet = False
+        lastvis = 0
 
         while True:
             # Print current instruction
             bin = format(state.mem[state.regs[15]], '016b')
 
             if quiet:
+                if screen is not None and time.time() > lastvis + 1./60:
+                    screen.draw(state)
+                    lastvis = time.time()
+
                 next = self.execute(bin, state)
                 if next.regs[15] == state.regs[15] or next.regs[15] in breakpoints:
                     quiet = False
@@ -215,6 +302,8 @@ class Simulator:
             next = copy.deepcopy(state)
 
             # Present interface
+            if screen is not None:
+                screen.draw(state)
             cmd = input('>> ').strip()
             if cmd == '' or cmd == 'n':
                 # Advance to next instruction
@@ -281,6 +370,7 @@ class Simulator:
             if diff != '':
                 print('     ' + diff)
             state = copy.deepcopy(next)
+
 
     def run(self, mem, origin, steps=1000):
         """Simulate machine code for a set number of steps and return PC."""

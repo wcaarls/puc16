@@ -157,9 +157,9 @@ pip install .
 # Usage
 
 ```
-usage: as-puc16 [-h] [-o OUTPUT] [-s] [-t N] [-E] file
+usage: as-puc16 [-h] [-o OUTPUT] [-s] [-v] [-t N] [-E] file
 
-PUC16 Assembler (c) 2020-2024 Wouter Caarls, PUC-Rio
+PUC16 Assembler (c) 2020-2025 Wouter Caarls, PUC-Rio
 
 positional arguments:
   file                  ASM source file
@@ -169,15 +169,16 @@ options:
   -o OUTPUT, --output OUTPUT
                         Output file
   -s, --simulate        Simulate resulting program
+  -v, --vga             Visualize VGA output during simulation
   -t N, --test N        Simulate for 1000 steps and check whether PC == N
   -E                    Output preprocessed assembly code
 
 ```
 
 ```
-usage: cc-puc16 [-h] [-o OUTPUT] [-s] [-t N] [-S] [-O {0,1,2}] file
+usage: cc-puc16 [-h] [-o OUTPUT] [-s] [-v] [-t N] [-S] [-O {0,1,2}] file
 
-PUC16 C compiler (c) 2020-2024 Wouter Caarls, PUC-Rio
+PUC16 C compiler (c) 2020-2025 Wouter Caarls, PUC-Rio
 
 positional arguments:
   file                  C source file
@@ -187,6 +188,7 @@ options:
   -o OUTPUT, --output OUTPUT
                         Output file
   -s, --simulate        Simulate resulting program
+  -v, --vga             Visualize VGA output during simulation
   -t N, --test N        Simulate for 1000 steps and check whether PC == N
   -S                    Output assembly code
   -O {0,1,2}            Optimization level
@@ -249,3 +251,11 @@ SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
 CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+The font was taken from [font8x8](https://github.com/dhepper/font8x8).
+
+Author: Daniel Hepper <daniel@hepper.net>
+
+Font author: Marcel Sondaar, International Business Machines
+
+License: Public Domain
